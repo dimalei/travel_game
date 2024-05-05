@@ -1,14 +1,16 @@
 from location import Location
+from search_api import SearchAPI
 import person
 
 
 class Game:
     def __init__(self) -> None:
-        self.mrx = person.Target()
+        search_api = SearchAPI()
+        self.mrx = person.Target(search_api)
         while True:
             location_input = input("Enter your starting location:\n")
             try:
-                self.player = person.Player(Location(location_input))
+                self.player = person.Player(Location(location_input, search_api))
                 break
             except ValueError:
                 print("Invalid Location Name. Try again.")
@@ -25,7 +27,7 @@ class Game:
         self.print_distance_target()
         self.help()
         while True:
-            command = input("Command:\n")
+            command = input("Command:\n").strip()
             if command == "1":
                 # move
                 print("work in progress")

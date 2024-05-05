@@ -19,8 +19,8 @@ class Person:
 
 class Target(Person):
     # The starting position of the target person is randomly picked from a list
-    def __init__(self) -> None:
-        super().__init__(Location(self.random_location()))
+    def __init__(self, api) -> None:
+        super().__init__(Location(self.random_location(), api))
 
     def random_location(self) -> str:
         locations = {}
