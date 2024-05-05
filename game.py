@@ -1,5 +1,6 @@
 from location import Location
 from search_api import SearchAPI
+from timetable import Timetable
 import person
 
 
@@ -14,6 +15,7 @@ class Game:
                 break
             except ValueError:
                 print("Invalid Location Name. Try again.")
+        self.timetable = Timetable(search_api)
 
     def help(self):
         print("move to: 1 | exit: 2")
@@ -25,16 +27,19 @@ class Game:
     def loop(self):
         print("###########")
         self.print_distance_target()
-        self.help()
         while True:
+            self.help()
             command = input("Command:\n").strip()
             if command == "1":
                 # move
-                print("work in progress")
+                if self.timetable.print_connections(self.player.location.name) == None:
+                    break
+                # print("work in progress")
             elif command == "2":
                 break
             else:
                 self.help()
+        print("######## GAME OVER ########")
 
 
 class Application:
@@ -54,8 +59,8 @@ class Application:
 
     def execute(self):
         self.welcome()
-        self.help()
         while True:
+            self.help()
             command = input("Command:\n")
             if command == "1":
                 session = Game()
