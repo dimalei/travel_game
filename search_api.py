@@ -32,7 +32,7 @@ class SearchAPI:
             if data["id"] != None:
                 return data
             else:
-                raise ValueError("Invalid Station Name.")
+                raise ValueError("Invalid Station Name: {self.stop_name}")
         except urllib.error.URLError:
             print("Connection timed out. Check your internet connection.")
             return None

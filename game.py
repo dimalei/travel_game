@@ -1,6 +1,7 @@
 from location import Location
 import person
 
+
 class Game:
     def __init__(self) -> None:
         self.mrx = person.Target()
@@ -12,10 +13,26 @@ class Game:
             except ValueError:
                 print("Invalid Location Name. Try again.")
 
-    def execute(self):
-        print(f"you are {self.player.location.distance_to(self.mrx.location)} km from your target")
-        pass
+    def help(self):
+        print("move to: 1 | exit: 2")
 
+    def print_distance_target(self):
+        print(
+            f"you are {self.player.distance_to_person(self.mrx)} km from your target")
+
+    def loop(self):
+        print("###########")
+        self.print_distance_target()
+        self.help()
+        while True:
+            command = input("Command:\n")
+            if command == "1":
+                # move
+                print("work in progress")
+            elif command == "2":
+                break
+            else:
+                self.help()
 
 
 class Application:
@@ -32,7 +49,7 @@ class Application:
 
     def help(self):
         print("start new game: 1 | exit: 2")
-            
+
     def execute(self):
         self.welcome()
         self.help()
@@ -40,12 +57,13 @@ class Application:
             command = input("Command:\n")
             if command == "1":
                 session = Game()
-                session.execute()
+                session.loop()
             elif command == "2":
                 break
             else:
                 self.help()
 
-a = Application()
-a.execute()
-    
+
+if __name__ == "__main__":
+    a = Application()
+    a.execute()

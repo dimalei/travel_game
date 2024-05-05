@@ -14,6 +14,8 @@ class Person:
     def __str__(self) -> str:
         return f"Location: {self.location}, travelled: {self.time_travelled}"
 
+    def distance_to_person(self, another: "Person") -> int:
+        return self.location.distance_to(another.location)
 
 class Target(Person):
     # The starting position of the target person is randomly picked from a list

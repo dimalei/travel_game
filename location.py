@@ -6,6 +6,8 @@ class Location:
     # defines a location based on a train station
     def __init__(self, name: str) -> None:
         station_info = SearchAPI.get_station_info(name)
+        if station_info == None:
+            raise ConnectionError("Could not veryfy loctation from the internet.")
         self.name = station_info["name"]
         self.coordinates = (station_info["lat"],station_info["lon"])
 
@@ -24,6 +26,6 @@ class Location:
 if __name__ == "__main__":
     a = Location("Aarau")
     # b = Location("jhgh") # raises ValueError
-    b = Location("jhgh")
+    b = Location("Bern")
     print(a)
     print(f"distance form {a.name} to {b.name} is {a.distance_to(b)}km")
