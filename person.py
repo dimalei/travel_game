@@ -18,6 +18,9 @@ class Person:
 
     def distance_to_person(self, another: "Person") -> int:
         return self.location.distance_to(another.location)
+    
+    def direction_to_person(self, another: "Person") -> str:
+        return self.location.NSWE_to(another.location)
 
 class Target(Person):
     # The starting position of the target person is randomly picked from a list

@@ -1,11 +1,9 @@
 from location import Location
 from search_api import SearchAPI
 from timetable import Timetable
-from clock import Clock
 import person
 from datetime import datetime
-
-from save_json import list_to_json
+import os
 
 
 class Game:
@@ -25,16 +23,20 @@ class Game:
         self.turns = 1
 
     def help(self):
-        print("[1] take a train [2] go to place [3] exit")
+        print("[1] Train from Timetable [2] Train to Destination [3] Use Radar [4] Exit")
+
+    def clear(cls):
+        os.system('cls')
+        os.system('clear')
 
     def print_status(self):
-        print(
-            f"You are now in {self.player.location.name}. Now is {(self.start_time+self.player.time_travelled).strftime('%A, %H:%M')}")
-        print(
-            f"Your target is {self.player.distance_to_person(self.mrx)} km from your position.")
+        print(f"You are now in {self.player.location.name}.")
+        print(f"Now is {(self.start_time+self.player.time_travelled).strftime('%A, %H:%M')}, Time passed: {self.player.time_travelled}")
+        print(f"Your target is {self.player.distance_to_person(self.mrx)} km from your position.\n")
 
     def loop(self):
         while True:
+            self.clear()
             print(f"{'#'*20} Turn {self.turns:02} {'#'*20}")
             self.print_status()
             while True:
@@ -52,24 +54,36 @@ class Game:
                         self.turns += 1
                     break
                 elif command == "3":
+                    # use radar
+                    self.use_radar()
+                    self.turns += 1
+                    break
+                elif command == "4":
                     print("######## GAME OVER ########")
                     return
                 else:
                     self.help()
 
+    def use_radar(self):
+        # returns the general direction, distance and amount of trainstations to targets location
+        print(f"Distance to target: {self.player.distance_to_person(self.mrx)} km {self.player.direction_to_person(self.mrx)}")
+        print(f"Stations to the Target: {self.tt.stops_to(self.player.location.name, self.mrx.location.name, self.start_time + self.player.time_travelled)}")
+        input("Press any key to contintue.")
+
     def direct_connection(self):
         destination = input("Where do you want to travel to? [0] Cancel\n")
         if destination == "0":
             return False
-        connection = self.tt.get_direct(self.player.location.name, destination, self.start_time + self.player.time_travelled)
+        connection = self.tt.get_direct(
+            self.player.location.name, destination, self.start_time + self.player.time_travelled)
         if connection == None:
             return False
-        command = input(f"Do you want to travel to {connection['stop']}? Arrival is {connection['arrival'][11:16]}. [Y] Yes, [0] Cancel\n")
+        command = input(
+            f"Do you want to travel to {connection['stop']}? Arrival is {connection['arrival'][11:16]}. [1] Yes, [0] Cancel\n")
         if command == "0":
             return False
         self.travel(self.player, connection)
         return True
-
 
     def travel(self, character: person.Person, new_station: dict):
         # places a person to a new station and adds their travel time
@@ -81,9 +95,6 @@ class Game:
             Location(new_station["stop"], self.search_api), time_passed)
         return True
 
-
-
-
     def take_train(self):
         # choose connection
         connection = self.choose_connection()
@@ -94,7 +105,7 @@ class Game:
         station = self.choose_stop(connection[0], connection[1])
         if station == None:
             return     # action cancelled
-        
+
         if self.travel(self.player, station):
             return True
 

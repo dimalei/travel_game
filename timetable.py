@@ -59,6 +59,16 @@ class Timetable:
         if "connections" in data:
             return {"stop":data["connections"][0]["to"], "arrival":data["connections"][0]["arrival"]}
 
+    def stops_to(self, player_location: str, target_location, time: datetime) -> int:
+        data = self.api.get_route(player_location, target_location, time.strftime("%H:%M"), time.strftime("%d/%m/%Y"), num=1)
+        stops = 0
+        for leg in data["connections"][0]["legs"]:
+            if leg["stops"] != None:
+                stops += len(leg["stops"])
+            else:
+                stops += 1
+        return stops
+
 
 if __name__ == "__main__":
     from search_api import SearchAPI
@@ -66,4 +76,5 @@ if __name__ == "__main__":
     t = Timetable(search)
     time = datetime.now()
     # t.get_connections("Aarau", time)
-    print(t.get_stops("IR 35", "Aarau", "Basel", time))
+    # print(t.get_stops("IR 35", "Aarau", "Basel", time))
+    print(t.stops_to("Aarau", "Basel", time))
