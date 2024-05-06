@@ -1,12 +1,13 @@
 from location import Location
 import json
 from random import choice
+from datetime import timedelta
 
 
 class Person:
     def __init__(self, location: Location) -> None:
         self.location = location
-        self.time_travelled = 0
+        self.time_travelled = timedelta()
 
     def move(self):
         pass
