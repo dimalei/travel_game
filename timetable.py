@@ -6,7 +6,7 @@ class Timetable:
     def __init__(self, api: object) -> None:
         self.api = api
 
-    def get_connections(self, station_name: str, time: datetime, amount=0) -> list:
+    def get_departures(self, station_name: str, time: datetime, amount=0) -> list:
         # gets a complete list of departures and returns a filtered list of the next high speed connections
         data = self.api.get_departure_info(station_name, amount, time.strftime("%H:%M"), time.strftime("%d/%m/%Y"))
         express_trains = {}
@@ -27,7 +27,7 @@ class Timetable:
 
         # get the connection with the selected line name
         for connection in data["connections"]:
-            list_to_json(connection, "connection_test.json")
+            # list_to_json(connection, "connection_test.json")
             for leg in connection["legs"]:
                 # list_to_json(leg, "leg_test.json")
                 if "line" in leg:
@@ -51,6 +51,13 @@ class Timetable:
                 my_stops.append({"stop":leg["exit"]["name"], "arrival":leg["exit"]["arrival"]})
         
         return my_stops
+
+    def get_direct(self, origin: str, destination: str, time: datetime) -> dict:
+        # returns a dict with the destination and arrival time of the desired destination (stop_name, arrival_time)
+        data = self.api.get_route(origin, destination, time.strftime("%H:%M"), time.strftime("%d/%m/%Y"), num=1)
+        list_to_json(data, "direct_test.json")
+        if "connections" in data:
+            return {"stop":data["connections"][0]["to"], "arrival":data["connections"][0]["arrival"]}
 
 
 if __name__ == "__main__":
