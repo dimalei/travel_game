@@ -32,7 +32,7 @@ class Target(Person):
         with open("start_locations.json") as my_locations:
             data = my_locations.read()
             locations = json.loads(data)
-        random_loc = choice(locations["starting_locations"])
+        random_loc = choice(locations["cities"])
         return random_loc
 
 
