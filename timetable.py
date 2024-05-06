@@ -27,7 +27,7 @@ class Timetable:
 
         # get the connection with the selected line name
         for connection in data["connections"]:
-            # list_to_json(connection, "connection_test.json")
+            list_to_json(connection, "connection_test.json")
             for leg in connection["legs"]:
                 # list_to_json(leg, "leg_test.json")
                 if "line" in leg:

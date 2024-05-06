@@ -9,8 +9,9 @@ class Person:
         self.location = location
         self.time_travelled = timedelta()
 
-    def move(self):
-        pass
+    def move(self, new_location: Location, time_passed: timedelta):
+        self.location = new_location
+        self.time_travelled = time_passed
 
     def __str__(self) -> str:
         return f"Location: {self.location}, travelled: {self.time_travelled}"

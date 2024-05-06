@@ -3,48 +3,50 @@ from search_api import SearchAPI
 from timetable import Timetable
 from clock import Clock
 import person
+from datetime import datetime
 
 from save_json import list_to_json
 
 
 class Game:
     def __init__(self) -> None:
-        search_api = SearchAPI()
-        self.tt = Timetable(search_api)
-        self.mrx = person.Target(search_api)
+        self.search_api = SearchAPI()
+        self.tt = Timetable(self.search_api)
+        self.mrx = person.Target(self.search_api)
         while True:
             location_input = input("Enter your starting location:\n")
             try:
                 self.player = person.Player(
-                    Location(location_input, search_api))
+                    Location(location_input, self.search_api))
                 break
             except ValueError:
                 print("Invalid Location Name. Try again.")
-        self.clock = Clock()
+        self.start_time = datetime.now()
 
     def help(self):
         print("[1] take a train [2] exit")
 
-    def print_distance_target(self):
+    def print_status(self):
+        print(f"You are now in {self.player.location.name}. Now is {(self.start_time+self.player.time_travelled).strftime('%A, %H:%M')}")
         print(
-            f"you are {self.player.distance_to_person(self.mrx)} km from your target")
+            f"Your target is {self.player.distance_to_person(self.mrx)} km from your position.")
 
     def loop(self):
-        print("###########")
-        self.print_distance_target()
         while True:
-            self.help()
-            command = input("Command:\n").strip()
-            if command == "1":
-                # taking a train
-                if self.take_train() == None:
-                    break
-                # print("work in progress")
-            elif command == "2":
-                break
-            else:
+            print("###########")
+            self.print_status()
+            while True:
                 self.help()
-        print("######## GAME OVER ########")
+                command = input("Command:\n").strip()
+                if command == "1":
+                    # taking a train
+                    if self.take_train():
+                        break
+                    # print("work in progress")
+                elif command == "2":
+                    return
+                else:
+                    self.help()
 
     def take_train(self):
         # choose connection
@@ -55,12 +57,16 @@ class Game:
         station = self.choose_stop(connection[0], connection[1])
         if station == None: return     # action cancelled
 
-        print(f"now travelling to {station}")
+        # arrival time is YYYY DD MM (wtf)
+        time_passed = datetime.strptime(station["arrival"], "%Y-%d-%m %H:%M:%S") - self.start_time
+        print(time_passed)
+        self.player.move(Location(station["stop"], self.search_api), time_passed)
+        return True
 
 
     def choose_stop(self, line: str, terminal: str) -> dict:
         print(f"line {line} terminal {terminal}")
-        stops = self.tt.get_stops(line, self.player.location.name, terminal, self.clock + self.player.time_travelled)
+        stops = self.tt.get_stops(line, self.player.location.name, terminal, self.start_time + self.player.time_travelled)
         print("Select your Stop:")
         for i, stop in enumerate(stops):
             print(f"[{i+1}] {stop['stop']} {stop['arrival'][11:16]}, ", end="")
@@ -84,7 +90,7 @@ class Game:
     def choose_connection(self) -> tuple:
         # returns the line and the terminal station that the player selected: (line, terminal) eg. (IR 16, Zürich HB)
         connections = self.tt.get_connections(
-            self.player.location.name, self.clock + self.player.time_travelled)
+            self.player.location.name, self.start_time + self.player.time_travelled)
         line_selection = ""
         terminal = ""
         print("Select your Connection:")
@@ -143,7 +149,7 @@ class Application:
                 break
             else:
                 self.help()
-
+        print("######## GAME OVER ########")
 
 if __name__ == "__main__":
     a = Application()
