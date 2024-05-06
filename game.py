@@ -37,6 +37,8 @@ class Game:
     def loop(self):
         while True:
             self.clear()
+            if self.has_won():
+                return True
             print(f"{'#'*20} Turn {self.turns:02} {'#'*20}")
             self.print_status()
             while True:
@@ -58,11 +60,23 @@ class Game:
                     self.use_radar()
                     self.turns += 1
                     break
+                elif command == "cheat":
+                    # use radar
+                    print(self.mrx.location.name)
+                    input("****")
+                    break
                 elif command == "4":
                     print("######## GAME OVER ########")
                     return
                 else:
                     self.help()
+
+    def has_won(self):
+        if self.player.location.name == self.mrx.location.name:
+            print("######## GAME WON ########")
+            return True
+        return False
+            
 
     def use_radar(self):
         # returns the general direction, distance and amount of trainstations to targets location
@@ -176,7 +190,7 @@ class Application:
         with open("art.txt") as art:
             word_art = art.read()
             print(word_art)
-            print(f"{'Version: ' + self.version:^88}")
+            print(f"{'Version: ' + self.version:^38}")
 
     def help(self):
         print("[1] start new game, [2] exit")
