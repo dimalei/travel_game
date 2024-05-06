@@ -182,6 +182,8 @@ class Application:
         print("[1] start new game, [2] exit")
 
     def execute(self):
+        os.system('cls')
+        os.system('clear')  
         self.welcome()
         while True:
             self.help()

@@ -21,15 +21,12 @@ class Timetable:
     def get_stops(self,line: str, origin: str, destination: str, time: datetime, amount=20):
         # retuns a list of stops on the selected line [(stop_name, arrival_time),(stop_name, arrival_time), etc.]
         data = self.api.get_route(origin, destination, time.strftime("%H:%M"), time.strftime("%d/%m/%Y"), amount)
-        # list_to_json(data, "connection.json")
         my_connection = {}
         my_stops = []
 
         # get the connection with the selected line name
         for connection in data["connections"]:
-            # list_to_json(connection, "connection_test.json")
             for leg in connection["legs"]:
-                # list_to_json(leg, "leg_test.json")
                 if "line" in leg:
                     if line == leg["line"]:
                         my_connection = connection
@@ -55,7 +52,6 @@ class Timetable:
     def get_direct(self, origin: str, destination: str, time: datetime) -> dict:
         # returns a dict with the destination and arrival time of the desired destination (stop_name, arrival_time)
         data = self.api.get_route(origin, destination, time.strftime("%H:%M"), time.strftime("%d/%m/%Y"), num=1)
-        list_to_json(data, "direct_test.json")
         if "connections" in data:
             return {"stop":data["connections"][0]["to"], "arrival":data["connections"][0]["arrival"]}
 
