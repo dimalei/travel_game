@@ -22,9 +22,10 @@ class Game:
             except ValueError:
                 print("Invalid Location Name. Try again.")
         self.start_time = datetime.now()
+        self.turns = 1
 
     def help(self):
-        print("[1] take a train [2] exit")
+        print("[1] take a train [2] go to place [3] exit")
 
     def print_status(self):
         print(f"You are now in {self.player.location.name}. Now is {(self.start_time+self.player.time_travelled).strftime('%A, %H:%M')}")
@@ -33,7 +34,7 @@ class Game:
 
     def loop(self):
         while True:
-            print("###########")
+            print(f"{'#'*20} Turn {self.turns:02} {'#'*20}")
             self.print_status()
             while True:
                 self.help()
@@ -41,9 +42,13 @@ class Game:
                 if command == "1":
                     # taking a train
                     if self.take_train():
+                        self.turns += 1
                         break
                     # print("work in progress")
                 elif command == "2":
+                    # direct connection
+                    break
+                elif command == "3":
                     return
                 else:
                     self.help()
