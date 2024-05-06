@@ -1,4 +1,6 @@
 from datetime import datetime
+from save_json import list_to_json
+
 
 class Timetable:
     def __init__(self, api: object) -> None:
@@ -16,17 +18,39 @@ class Timetable:
             return None
         return express_trains
 
-    def get_line(self,line: str, origin: str, destination: str, time: datetime, amount=20):
+    def get_stops(self,line: str, origin: str, destination: str, time: datetime, amount=20):
+        # retuns a list of stops on the selected line [(stop_name, arrival_time),(stop_name, arrival_time), etc.]
         data = self.api.get_route(origin, destination, time.strftime("%H:%M"), time.strftime("%d/%m/%Y"), amount)
-        stops = []
+        # list_to_json(data, "connection.json")
         my_connection = {}
+        my_stops = []
+
+        # get the connection with the selected line name
         for connection in data["connections"]:
-            print(connection["legs"][0]["line"])
-            if connection["legs"][0]["line"] == line:
-                my_connection = connection
+            # list_to_json(connection, "connection_test.json")
+            for leg in connection["legs"]:
+                # list_to_json(leg, "leg_test.json")
+                if "line" in leg:
+                    if line == leg["line"]:
+                        my_connection = connection
+                        break
+            if my_connection != {}:
                 break
-        print(my_connection)
-        return my_connection
+        # take the first one available if no line exists
+        if my_connection == {}:
+            my_connection = data["connections"][0]
+
+        # create the list with the stops withn that connection
+        for leg in my_connection["legs"]:
+            if "stops" in leg:
+                if isinstance(leg["stops"], list):
+                    for stop in leg["stops"]:
+                        if "arrival" in stop:
+                            my_stops.append({"stop":stop['name'], "arrival":stop['arrival']})
+            if "exit" in leg:
+                my_stops.append({"stop":leg["exit"]["name"], "arrival":leg["exit"]["arrival"]})
+        
+        return my_stops
 
 
 if __name__ == "__main__":
@@ -35,4 +59,4 @@ if __name__ == "__main__":
     t = Timetable(search)
     time = datetime.now()
     # t.get_connections("Aarau", time)
-    t.get_line("IR 16", "Aarau", "Zürich", time)
+    print(t.get_stops("IR 35", "Aarau", "Basel", time))

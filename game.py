@@ -4,6 +4,8 @@ from timetable import Timetable
 from clock import Clock
 import person
 
+from save_json import list_to_json
+
 
 class Game:
     def __init__(self) -> None:
@@ -47,15 +49,43 @@ class Game:
     def take_train(self):
         # choose connection
         connection = self.choose_connection()
-        if connection == None: return   # acton cancelled
+        if connection == None: return   # action cancelled
+
+        # choose station to travel to
+        station = self.choose_stop(connection[0], connection[1])
+        if station == None: return     # action cancelled
+
+        print(f"now travelling to {station}")
+
+
+    def choose_stop(self, line: str, terminal: str) -> dict:
+        print(f"line {line} terminal {terminal}")
+        stops = self.tt.get_stops(line, self.player.location.name, terminal, self.clock + self.player.time_travelled)
+        print("Select your Stop:")
+        for i, stop in enumerate(stops):
+            print(f"[{i+1}] {stop['stop']} {stop['arrival'][11:16]}, ", end="")
+        print("[0] Cancel")
+        while True:
+            stop_selction = input()
+            try:
+                stop_selction = int(stop_selction)
+            except ValueError:
+                print("Enter a number.")
+                continue
+            if stop_selction - 1 in range(len(stops)):
+                return stops[stop_selction - 1]
+            elif stop_selction == 0:
+                return None
+            else:
+                print("Invalid Input")
 
 
 
     def choose_connection(self) -> tuple:
-        # get a list of connections, choose a line, choose how many stations and then move the player
+        # returns the line and the terminal station that the player selected: (line, terminal) eg. (IR 16, Zürich HB)
         connections = self.tt.get_connections(
             self.player.location.name, self.clock + self.player.time_travelled)
-        line = ""
+        line_selection = ""
         terminal = ""
         print("Select your Connection:")
         for i, connection in enumerate(connections.items()):
@@ -63,27 +93,27 @@ class Game:
                 f"[{i+1}] {connection[0]:<5} to {connection[1]['destination']:<16} at {connection[1]['departure'][11:16]}")
         print("[0] Cancel")
         while True:
-            line = input()
+            line_selection = input()
             try:
-                line = int(line)
+                line_selection = int(line_selection)
             except ValueError:
                 print("Enter a number.")
                 continue
-            if line - 1 in range(len(connections)):
+            if line_selection - 1 in range(len(connections)):
                 # line selected
                 for i, connection in enumerate(connections.items()):
-                    if i + 1 == line:
-                        line = connection[0]
+                    if i + 1 == line_selection:
+                        line_selection = connection[0]
                         terminal = connection[1]['destination']
                         break
                 break
-            elif line == 0:
+            elif line_selection == 0:
                 # cancel taking the train
                 return None
             else:
                 print("Invalid Input")
         # print(f"selected line: {line}, terminal: {terminal}")
-        return (line, terminal)
+        return (line_selection, terminal)
 
 
 class Application:
